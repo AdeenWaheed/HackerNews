@@ -9,6 +9,13 @@ namespace HackerNewsAPI.Controllers
     [ApiController]
     public class HackerNewsController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
+
+        public HackerNewsController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         /// <summary>
         /// Get best n stories from Hacker News API
         /// </summary>
@@ -24,7 +31,7 @@ namespace HackerNewsAPI.Controllers
                 var bestStories = new List<StoryDetails>();
                 using (HttpClient httpClient = new HttpClient())
                 {
-                    string bestStoriesAPIUrl = "https://hacker-news.firebaseio.com/v0/beststories.json";
+                    string bestStoriesAPIUrl = $"{_configuration["HackerNewsAPIS:BestStoriesAPIUrl"]}.json";
                     HttpRequestMessage bestStoriesRequest = new HttpRequestMessage(HttpMethod.Get, bestStoriesAPIUrl);
                     HttpResponseMessage bestStoriesResponse = await httpClient.SendAsync(bestStoriesRequest);
 
@@ -35,7 +42,7 @@ namespace HackerNewsAPI.Controllers
 
                         foreach (var storyId in bestStoryIds.Take(n))
                         {
-                            string storyDetailsAPIUrl = $"https://hacker-news.firebaseio.com/v0/item/{storyId}.json";
+                            string storyDetailsAPIUrl = $"{_configuration["HackerNewsAPIS:StoryDetailsAPIUrl"]}{storyId}.json";
                             HttpRequestMessage storyDetailsRequest = new HttpRequestMessage(HttpMethod.Get, storyDetailsAPIUrl);
                             HttpResponseMessage storyDetailsResponse = await httpClient.SendAsync(storyDetailsRequest);
 
